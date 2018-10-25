@@ -1,6 +1,6 @@
 WORKING_DIR=".";
 TESTING_DIR="COMPARE_TESTS";
-ACCEPT_DATA_LIMIT=6500;
+ACCEPT_DATA_LIMIT=300;
 REJECT_LINE_LIMIT=50;
 
 # Check if testing directory exists.
@@ -24,7 +24,7 @@ for i in `ls -1`; do
 			ORIG_FILE_1_SIZE=`du -h -b "$i"`;
 			FILE_1_SIZE=${ORIG_FILE_1_SIZE%%	*};
 			
-			echo "[Info] Evaluating file sizes of $i.";
+			echo "[Info] Evaluating file sizes of $j.";
 			ORIG_FILE_2_SIZE=`du -h -b "$j"`;
 			FILE_2_SIZE=${ORIG_FILE_2_SIZE%%	*};
 			
@@ -47,7 +47,9 @@ for i in `ls -1`; do
 			ORIG_COMPARE_SIZE=`du -h -b "$COMPARE_FILE"`;
 			COMPARE_SIZE=${ORIG_COMPARE_SIZE%%	*};
 
-			if [ $COMPARE_SIZE -ge $ACCEPT_DATA_LIMIT ]; then
+			((DATA_LIMIT=$FILE_1_SIZE+$FILE_2_SIZE-$COMPARE_SIZE+$ACCEPT_DATA_LIMIT))
+
+			if [ $DATA_LIMIT -le 0 ]; then
 				echo "[Info] Comparing $i $j OK!";
 				echo "[Info] Deleting compare files.";
 				rm "$COMPARE_FILE";
@@ -55,8 +57,28 @@ for i in `ls -1`; do
 				cd "..";
 				continue;
 			fi
-			
+
+			echo "[Info] Stage 3: Checking those files line by line.";
+			FILE_1_DIFFERENT_LINES=`grep ^[-][a-zA-Z0-P_=" "\*\&\(\)\$"	"] "$COMPARE_FILE" | wc -l`;
+			FILE_2_DIFFERENT_LINES=`grep ^[+][a-zA-Z0-P_=" "\*\&\(\)\$"	"] "$COMPARE_FILE" | wc -l`;
+			if [ $FILE_1_DIFFERENT_LINES -ge $REJECT_LINE_LIMIT ] && [ $FILE_2_DIFFERENT_LINES -ge $REJECT_LINE_LIMIT ]; then
+				echo "[Info] Comparing $i $j OK!";
+				echo "[Info] Deleting compare files.";
+				rm "$COMPARE_FILE";
+				echo "[Info] Deleting OK!";
+				cd "..";
+				continue;
+			fi
+
+			echo "[Info] Suspected plagiarism detected. Different lines lower than the limit.";
+			echo "[Info] Details: ";
+			echo "#1 Filename: $i::Different lines: $FILE_1_DIFFERENT_LINES.";
+			echo "#2 Filename: $j::Different lines: $FILE_2_DIFFERENT_LINES.";
+			echo "[Preserving difference file for further investigation.]";
+			sleep 2;
+
 			cd "..";
 		fi
 	done
 done
+
