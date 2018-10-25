@@ -12,9 +12,9 @@ chmod +x diffcheck.sh
 We are going to do a 3-step check to roughly detect code plagiarism.
 * Step 1: Using *diff* tool to check if two files are identical. If true, put it in a record.
 * Step 2: Using *du* tool to detect hwo different two files above is. If it's different above a limit($ACCEPT_DATA_LIMIT), accept the pair.
-* Step 3: Basically analyzing those two files to judge suspected code plagiarism.
+* Step 3: Basically analyzing those two files to judge suspected code plagiarism using a line limit($REJECT_LINE_LIMIT).
 
-**Note:** You can easily convert the code to detect other languages by changing the annotation flag.
+**Note:** You can convert the code to detect other languages by changing the annotation flag and the $regexp.
 
 ## Update Notes:
 
