@@ -4,7 +4,8 @@ A lightweight tool to *ROUGHLY* detect of code plagiarism in Python using bash s
 Command need in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm, grep, wc**.
 
 Usage:
-``` shell
+```
+chmod +x diffcheck.sh
 ./diffcheck.sh
 ```
 
