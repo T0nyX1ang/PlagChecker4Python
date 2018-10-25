@@ -1,7 +1,7 @@
 # PlagKiller
 A lightweight tool to *ROUGHLY* detect of code plagiarism in Python using bash shell. 
 
-Command need in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm**.
+Command need in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm, grep, wc**.
 
 Usage:
 ``` shell
@@ -16,6 +16,10 @@ We are going to do a 3-step check to roughly detect code plagiarism.
 **Note:** You can easily convert the code to detect other languages by changing the annotation flag.
 
 ## Update Notes:
+
+### Version 0.3.0
+* Initial version of Step 3 implementation.
+* Change the calculating algorithm in Step 2.
 
 ### Version 0.2.0
 * Initial version of Step 2 implementation.
