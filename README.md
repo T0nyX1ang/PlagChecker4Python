@@ -18,17 +18,17 @@ We are going to do a 3-step check to roughly detect code plagiarism.
 ## Update Notes:
 
 ### Version 0.2.0
-Initial version of Step 2 implementation.
+* Initial version of Step 2 implementation.
 
 ### Version 0.1.3
-Bug fixes in Step 1.
+* Bug fixes in Step 1.
 
 ### Version 0.1.2
-Add help notes inside the program to control better.
+* Add help notes inside the program to control better.
 
 ### Version 0.1.1
-Bug fixes in Step 1.
+* Bug fixes in Step 1.
 
 ### Version 0.1.0
-Initial version of Step 1 implementation.
+* Initial version of Step 1 implementation.
 
