@@ -18,6 +18,10 @@ We are going to do a 3-step check to roughly detect code plagiarism.
 
 ## Update Notes:
 
+### Version 0.3.1
+* Add verification for Python file extension(.py)
+* Change algorithm in Step 3 to reduce size.
+
 ### Version 0.3.0
 * Initial version of Step 3 implementation.
 * Change the calculating algorithm in Step 2.
