@@ -15,8 +15,12 @@ if [[ ! -w "$TESTING_DIR" ]] || [[ ! -w "$WORKING_DIR" ]]; then
 	exit;
 fi
 
-for i in `ls -1`; do
-	for j in `ls -1`; do
+if [[ ! -s "log.txt" ]]; then
+	rm "log.txt";
+fi
+
+for i in `ls -1 | grep .py$ `; do
+	for j in `ls -1 | grep .py$ `; do
 		if [[ "$i" < "$j" ]] && [[ "$i" != "diffcheck.sh" ]] && [[ "$j" != "diffcheck.sh" ]] && [[ "$i" != "$TESTING_DIR" ]] && [[ "$j" != "$TESTING_DIR" ]]; then
 			COMPARE_FILE="$i""_COMPARE_""$j"".txt";
 
@@ -61,7 +65,7 @@ for i in `ls -1`; do
 			echo "[Info] Stage 3: Checking those files line by line.";
 			FILE_1_DIFFERENT_LINES=`grep ^[-][a-zA-Z0-P_=" "\*\&\(\)\$"	"] "$COMPARE_FILE" | wc -l`;
 			FILE_2_DIFFERENT_LINES=`grep ^[+][a-zA-Z0-P_=" "\*\&\(\)\$"	"] "$COMPARE_FILE" | wc -l`;
-			if [ $FILE_1_DIFFERENT_LINES -ge $REJECT_LINE_LIMIT ] && [ $FILE_2_DIFFERENT_LINES -ge $REJECT_LINE_LIMIT ]; then
+			if [ $FILE_1_DIFFERENT_LINES -ge $REJECT_LINE_LIMIT ] || [ $FILE_2_DIFFERENT_LINES -ge $REJECT_LINE_LIMIT ]; then
 				echo "[Info] Comparing $i $j OK!";
 				echo "[Info] Deleting compare files.";
 				rm "$COMPARE_FILE";
@@ -71,14 +75,18 @@ for i in `ls -1`; do
 			fi
 
 			echo "[Info] Suspected plagiarism detected. Different lines lower than the limit.";
-			echo "[Info] Details: ";
-			echo "#1 Filename: $i::Different lines: $FILE_1_DIFFERENT_LINES.";
-			echo "#2 Filename: $j::Different lines: $FILE_2_DIFFERENT_LINES.";
+			echo "[Info] Saving file digest to log.";
+			echo "-------- File Digest Separator --------" >> "log.txt";
+			echo "#1 Filename: $i::Different lines: $FILE_1_DIFFERENT_LINES." >> "log.txt";
+			echo "#2 Filename: $j::Different lines: $FILE_2_DIFFERENT_LINES." >> "log.txt";
+			echo "" >> "log.txt";
 			echo "[Preserving difference file for further investigation.]";
-			sleep 2;
+			
+			#sleep 2;
 
 			cd "..";
 		fi
 	done
 done
+
 
