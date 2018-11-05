@@ -1,4 +1,4 @@
-# PlagKiller
+# PlagChecker4Python
 A lightweight tool to *ROUGHLY* detect of code plagiarism in Python using bash shell. 
 
 Command needed in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm, grep, wc**.
