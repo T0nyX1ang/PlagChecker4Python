@@ -18,6 +18,12 @@ We are going to do a 3-step check to roughly detect code plagiarism.
 
 ## Update Notes:
 
+### Version 0.3.2
+* Fix a bug in detecting and deleting log files.
+* Change methods in detecting suspected plagiarism in Step 3. Use scores to judge.
+* Change a bit of log file contents.
+* **NOTICE: There is a potential defect: this code can't detect spaces well, so a file with elaborated construction might go wrong in certain cases. Handle this with care!**
+
 ### Version 0.3.1
 * Add verification for Python file extension(.py)
 * Change algorithm in Step 3 to reduce size.
