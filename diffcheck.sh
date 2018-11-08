@@ -11,6 +11,8 @@ readonly CGrn="\e[0;32m"
 readonly CYel="\e[0;33m"
 readonly CClr="\e[0m"
 
+SUMMARY_LINE="Summary of files: ";
+
 # Check if testing directory exists.
 if [[ ! -d "$TESTING_DIR" ]]; then
 	echo -e "${CGrn}[Info] Creating testing directory.$CClr";
@@ -25,7 +27,7 @@ if [[ ! -w "$TESTING_DIR" ]] || [[ ! -w "$WORKING_DIR" ]]; then
 fi
 
 if [[ -f "$TESTING_DIR/log.txt" ]]; then
-	echo -e "${CGrn}[Info] Deleting existing log file.";
+	echo -e "${CGrn}[Info] Deleting existing log file.$CClr";
 	rm "$TESTING_DIR/log.txt";
 fi
 
@@ -64,7 +66,6 @@ for i in `ls -1 | grep .py$ `; do
 				echo -e "#1 Filename: $i::File #1 lines: $FILE_1_LINES::Different lines: 0::Score = 0." >> "log.txt";
 				echo -e "#2 Filename: $j::File #2 lines: $FILE_2_LINES::Different lines: 0::Score = 0." >> "log.txt";
 				echo -e "" >> "log.txt";
-				sleep 1;
 				cd "..";
 				continue;
 			fi
@@ -106,12 +107,22 @@ for i in `ls -1 | grep .py$ `; do
 			echo -e "#1 Filename: $i::File #1 lines: $FILE_1_LINES::Different lines: $FILE_1_DIFFERENT_LINES::Score = $FILE_1_SCORE." >> "log.txt";
 			echo -e "#2 Filename: $j::File #2 lines: $FILE_2_LINES::Different lines: $FILE_2_DIFFERENT_LINES::Score = $FILE_2_SCORE." >> "log.txt";
 			echo -e "" >> "log.txt";
-			sleep 1;
 			echo -e "${CGrn}[Info] Preserving difference file for further investigation.$CClr";
 
 			cd "..";
+
+			echo -e "${CGrn}[Info] Stage 4: Comparing last modified time.$CClr";
+			if [[ `find $i -newer $j` == $j ]]; then
+				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$i$CClr->${CRed}$j$CClr[$FILE_1_SCORE:$FILE_2_SCORE].";
+			else
+				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$j$CClr->${CRed}$i$CClr[$FILE_2_SCORE:$FILE_1_SCORE].";
+			fi
+
 		fi
 	done
 done
 
-
+echo -e "Clearing screen ...";
+sleep 3;
+clear;
+echo -e "$SUMMARY_LINE";
