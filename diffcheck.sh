@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# 123456789 test for git push
-
 # Parameters and syntax check.
 if [[ $1 == "-h" ]]; then
 	# Print help 
