@@ -6,7 +6,9 @@ Command needed in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm,
 Usage:
 ```
 chmod +x diffcheck.sh
-./diffcheck.sh
+./diffcheck.sh 
+or 
+./diffcheck.sh -q/u/v -l/n/s
 ```
 
 We are going to do a 3-step check to roughly detect code plagiarism. And a bonus step to detect copyer and copyee.
@@ -18,6 +20,12 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 **Note:** You can convert the code to detect other languages by changing the annotation flag and the regular expressions in the source code.
 
 ## Update Notes:
+
+### Version 0.5.0
+* Make parameters to let user judge checking criterion. You can use -q/u/v to adjust **verbosity**, -l/n/s to adjust **$REJECT_LINE_SCORE**, -h to invoke **help**. Default criterion will be -u -v (if you use it as before). See help to get more infomation.
+* Change some infomation conditions according to the parameter.
+* Add a help inside the program.
+* **NOTICE: The increasing code lines are really annoying. We are planning to use another language with the core features in the program in future versions.**
 
 ### Version 0.4.1
 * Fix a typo.
