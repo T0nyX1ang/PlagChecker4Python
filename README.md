@@ -26,7 +26,7 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 ### Version 0.4.0
 * Fix a bug in color demonstration.
 * Add a summary feature by comparing last modified time to conduct the copyer and copyee.
-* Remove the sleeping feature when detecting a plagarism code and substitude it with a screen clear.
+* Remove the sleeping feature when detecting a plagiarism code and substitude it with a screen clear.
 * **NOTICE: We will make parameters to let user judge checking criterion.**
 
 ### Version 0.3.3
