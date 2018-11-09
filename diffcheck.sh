@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# signed gpg commits for tests.
+
 # Parameters and syntax check.
 if [[ $1 == "-h" ]]; then
 	# Print help 
