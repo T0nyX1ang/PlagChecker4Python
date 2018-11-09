@@ -112,10 +112,10 @@ for i in `ls -1 | grep .py$ `; do
 			cd "..";
 
 			echo -e "${CGrn}[Info] Stage 4: Comparing last modified time.$CClr";
-			if [[ `find $i -newer $j` == $j ]]; then
-				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$i$CClr->${CRed}$j$CClr[$FILE_1_SCORE:$FILE_2_SCORE].";
+			if [[ `find $i -newer $j` == $i ]]; then
+				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$j$CClr->${CRed}$i$CClr [$FILE_2_SCORE:$FILE_1_SCORE].";
 			else
-				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$j$CClr->${CRed}$i$CClr[$FILE_2_SCORE:$FILE_1_SCORE].";
+				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$i$CClr->${CRed}$j$CClr [$FILE_1_SCORE:$FILE_2_SCORE].";
 			fi
 
 		fi
