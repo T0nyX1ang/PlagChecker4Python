@@ -1,7 +1,7 @@
 # PlagChecker4Python
 A lightweight tool to *ROUGHLY* detect of code plagiarism in Python using bash shell. 
 
-Command needed in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm, grep, wc**.
+Command needed in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm, grep, wc, find**.
 
 Usage:
 ```
@@ -18,6 +18,10 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 **Note:** You can convert the code to detect other languages by changing the annotation flag and the regular expressions in the source code.
 
 ## Update Notes:
+
+### Version 0.4.1
+* Fix a typo.
+* Fix a *critical* bug which causes failure to detect copyer and copyee.
 
 ### Version 0.4.0
 * Fix a bug in color demonstration.
