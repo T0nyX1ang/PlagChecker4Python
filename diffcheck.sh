@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# signed gpg commits for tests.
+# signed gpg commits for tests. 123456789
 
 # Parameters and syntax check.
 if [[ $1 == "-h" ]]; then
