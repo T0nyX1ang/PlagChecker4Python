@@ -21,6 +21,10 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 
 ## Update Notes:
 
+### Version 0.5.2
+* Add a $FORMATTER to take place in displaying messages instead of using if-condition clauses. (Although this operation will make the process a bit longer.)
+* Recover the styles of displaying messages in **Version 0.4.1.**
+
 ### Version 0.5.1
 * Add a feature to let user decide $REJECT_LINE_SCORE. And if this fails, an error message will be shown.
 * Enable colors in parameter checking.
