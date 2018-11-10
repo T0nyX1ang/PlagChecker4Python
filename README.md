@@ -21,6 +21,10 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 
 ## Update Notes:
 
+### Version 0.5.3
+* Add more detailed statistics descriptions in the summary and somewhat change the format.
+* **NOTICE: The final version is coming soon, after those parameters are working fine after simplifying some codes.**
+
 ### Version 0.5.2
 * Add a $FORMATTER to take place in displaying messages instead of using if-condition clauses. (Although this operation will make the process a bit longer.)
 * Recover the styles of displaying messages in **Version 0.4.1.**

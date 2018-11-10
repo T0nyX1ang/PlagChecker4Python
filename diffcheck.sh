@@ -23,7 +23,7 @@ if [[ $1 == "-h" ]]; then
 	echo -e "  -n Normal mode. Files lower than 70 scores will be judged as suspected. [Default]";
 	echo -e "  -s Strict mode. Files lower than 80 scores will be judged as suspected.";
 	echo -e "  -S Score mode. You can specify your score limit with -S=[your score]."
-	exit
+	exit;
 elif [[ $1 == "-q" ]] || [[ $1 == "-u" ]] || [[ $1 == "-v" ]]; then
 	readonly VERBOSITY=$1;
 	if [[ $2 == "-l" ]] || [[ $2 == "-n" ]] || [[ $2 == "-s" ]]; then
@@ -36,11 +36,11 @@ elif [[ $1 == "-q" ]] || [[ $1 == "-u" ]] || [[ $1 == "-v" ]]; then
 			REJECT_LINE_SCORE=$temp;
 		else
 			echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
-			exit
+			exit;
 		fi
 	else
 		echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
-		exit
+		exit;
 	fi
 elif [[ $1 == "-l" ]] || [[ $1 == "-n" ]] || [[ $1 == "-s" ]] || [[ ${1%=*} == "-S" ]]; then
 	if [[ ${1%=*} == "-S" ]]; then
@@ -49,7 +49,7 @@ elif [[ $1 == "-l" ]] || [[ $1 == "-n" ]] || [[ $1 == "-s" ]] || [[ ${1%=*} == "
 			REJECT_LINE_SCORE=$temp;
 		else
 			echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
-			exit
+			exit;
 		fi
 	else
 		readonly STRICTNESS=$1;
@@ -60,14 +60,14 @@ elif [[ $1 == "-l" ]] || [[ $1 == "-n" ]] || [[ $1 == "-s" ]] || [[ ${1%=*} == "
 		readonly VERBOSITY="-u";
 	else
 		echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
-		exit
+		exit;
 	fi
 elif [[ $1 == "" ]]; then
 	readonly VERBOSITY="-u";
 	readonly STRICTNESS="-n";
 else
 	echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
-	exit
+	exit;
 fi
 
 # Configuration for working environment.
@@ -111,6 +111,13 @@ if [[ -f "$TESTING_DIR/log.txt" ]]; then
 	rm "$TESTING_DIR/log.txt";
 fi
 
+# Basic stats.
+TOTAL_FILES=`ls -1 | wc -l`;
+VALID_FILES=`ls -1 | grep .py$ | wc -l`;
+((TOTAL_FILES=$TOTAL_FILES-2));
+((CHECKED_PAIRS=$VALID_FILES*($VALID_FILES-1)/2));
+FATAL_PAIRS=0;
+
 # Main process goes here.
 for i in `ls -1 | grep .py$ `; do
 	for j in `ls -1 | grep .py$ `; do
@@ -145,6 +152,7 @@ for i in `ls -1 | grep .py$ `; do
 				echo -e "#2 Filename: $j::File #2 lines: $FILE_2_LINES::Different lines: 0::Score = 0." >> "log.txt";
 				echo -e "" >> "log.txt";
 				cd "..";
+				((FATAL_PAIRS=$FATAL_PAIRS+1))
 				continue;
 			fi
 			
@@ -186,6 +194,7 @@ for i in `ls -1 | grep .py$ `; do
 			echo -e "#2 Filename: $j::File #2 lines: $FILE_2_LINES::Different lines: $FILE_2_DIFFERENT_LINES::Score = $FILE_2_SCORE." >> "log.txt";
 			echo -e "" >> "log.txt";
 			echo -e "${CGrn}[Info] Preserving difference file for further investigation.$CClr" | grep "$FORMATTER";
+			((FATAL_PAIRS=$FATAL_PAIRS+1))
 
 			# Step 4
 			echo -e "${CGrn}[Info] Stage 4: Comparing last modified time.$CClr" | grep "$FORMATTER";
@@ -206,4 +215,8 @@ if [[ "$VERBOSITY" != "-q" ]]; then
 fi
 
 clear;
+echo -e "------ SUMMARY ------";
+echo -e "${VALID_FILES} valid files out of ${TOTAL_FILES} files.";
+echo -e "${FATAL_PAIRS} suspected/detected plagiarism pairs out of ${CHECKED_PAIRS} pairs.";
+echo -e "---------------------";
 echo -e "$SUMMARY_LINE";
