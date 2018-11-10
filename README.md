@@ -8,7 +8,7 @@ Usage:
 chmod +x diffcheck.sh
 ./diffcheck.sh 
 or 
-./diffcheck.sh -q/u/v -l/n/s
+./diffcheck.sh -q/u/v -l/n/s/S=[score]
 ```
 
 We are going to do a 3-step check to roughly detect code plagiarism. And a bonus step to detect copyer and copyee.
@@ -20,6 +20,11 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 **Note:** You can convert the code to detect other languages by changing the annotation flag and the regular expressions in the source code.
 
 ## Update Notes:
+
+### Version 0.5.1
+* Add a feature to let user decide $REJECT_LINE_SCORE. And if this fails, an error message will be shown.
+* Enable colors in parameter checking.
+* Change message displays in quiet mode(-q), showing those error messages now.
 
 ### Version 0.5.0
 * Make parameters to let user judge checking criterion. You can use -q/u/v to adjust **verbosity**, -l/n/s to adjust **$REJECT_LINE_SCORE**, -h to invoke **help**. Default criterion will be -u -v (if you use it as before). See help to get more infomation.
@@ -34,7 +39,7 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 ### Version 0.4.0
 * Fix a bug in color demonstration.
 * Add a summary feature by comparing last modified time to conduct the copyer and copyee.
-* Remove the sleeping feature when detecting a plagiarism code and substitude it with a screen clear.
+* Remove the sleeping feature when detecting a plagiarism code and substitute it with a screen clear.
 * **NOTICE: We will make parameters to let user judge checking criterion.**
 
 ### Version 0.3.3
