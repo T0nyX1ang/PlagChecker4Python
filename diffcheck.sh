@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Define colors
+readonly CRed="\e[0;31m";
+readonly CGrn="\e[0;32m";
+readonly CYel="\e[0;33m";
+readonly CClr="\e[0m";
+
 # Parameters and syntax check.
 if [[ $1 == "-h" ]]; then
 	# Print help 
@@ -7,15 +13,16 @@ if [[ $1 == "-h" ]]; then
 	echo -e "A lightweight tool to detect structure of code plagiarism.";
 	echo -e "Written by Tony Xiang.\n";
 	echo -e "Usage: ./diffcheck.sh [parameters]\n";
-	echo -e "The parameters should follow like this: -verbosity[-q/u/v] -strictness[-l/n/s] \n";
+	echo -e "The parameters should follow like this: -verbosity[-q/u/v] -strictness[-l/n/s/S=0-100] \n";
 	echo -e "Verbosity options:";
-	echo -e "\t-q Quiet mode. Will not generate messages. Only summary will be shown.";
-	echo -e "\t-u Urgent-only mode. Will generate urgent(Detected/Suspected/Error) messages. [Default]";
-	echo -e "\t-v Verbose mode. Will generate full(Detected/Suspected/Error/Info) messages.\n";
+	echo -e "  -q Quiet mode. Will not generate messages. Only summary and error message will be shown.";
+	echo -e "  -u Urgent-only mode. Will generate urgent(Detected/Suspected/Error) messages. [Default]";
+	echo -e "  -v Verbose mode. Will generate full(Detected/Suspected/Error/Info) messages.\n";
 	echo -e "Strictness options:";
-	echo -e "\t-l Loose mode. Files lower than 60 scores will be judged as suspected.";
-	echo -e "\t-n Normal mode. Files lower than 70 scores will be judged as suspected. [Default]";
-	echo -e "\t-s Strict mode. Files lower than 80 scores will be judged as suspected.";
+	echo -e "  -l Loose mode. Files lower than 60 scores will be judged as suspected.";
+	echo -e "  -n Normal mode. Files lower than 70 scores will be judged as suspected. [Default]";
+	echo -e "  -s Strict mode. Files lower than 80 scores will be judged as suspected.";
+	echo -e "  -S Score mode. You can specify your score limit with -S=[your score]."
 	exit
 elif [[ $1 == "-q" ]] || [[ $1 == "-u" ]] || [[ $1 == "-v" ]]; then
 	readonly VERBOSITY=$1;
@@ -23,25 +30,43 @@ elif [[ $1 == "-q" ]] || [[ $1 == "-u" ]] || [[ $1 == "-v" ]]; then
 		readonly STRICTNESS=$2;
 	elif [[ $2 == "" ]]; then
 		readonly STRICTNESS="-n";
+	elif [[ ${2%=*} == "-S" ]]; then
+		temp=`echo -e ${2##*=}`;
+		if [ -n "$temp" -a "$temp" = "${temp//[^0-9]/}" ] && [ $temp -ge 0 ] && [ $temp -le 100 ]; then
+			REJECT_LINE_SCORE=$temp;
+		else
+			echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
+			exit
+		fi
 	else
-		echo -e "Invalid syntax.\n";
+		echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
 		exit
 	fi
-elif [[ $1 == "-l" ]] || [[ $1 == "-n" ]] || [[ $1 == "-s" ]]; then
-	readonly STRICTNESS=$1;
+elif [[ $1 == "-l" ]] || [[ $1 == "-n" ]] || [[ $1 == "-s" ]] || [[ ${1%=*} == "-S" ]]; then
+	if [[ ${1%=*} == "-S" ]]; then
+		temp=`echo -e ${1##*=}`;
+		if [ -n "$temp" -a "$temp" = "${temp//[^0-9]/}" ] && [ $temp -ge 0 ] && [ $temp -le 100 ]; then
+			REJECT_LINE_SCORE=$temp;
+		else
+			echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
+			exit
+		fi
+	else
+		readonly STRICTNESS=$1;
+	fi
 	if [[ $2 == "-q" ]] || [[ $2 == "-u" ]] || [[ $2 == "-v" ]]; then
 		readonly VERBOSITY=$2;
 	elif [[ $2 == "" ]]; then
 		readonly VERBOSITY="-u";
 	else
-		echo -e "Invalid syntax.\n";
+		echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
 		exit
 	fi
 elif [[ $1 == "" ]]; then
 	readonly VERBOSITY="-u";
 	readonly STRICTNESS="-n";
 else
-	echo -e "Invalid syntax. \n";
+	echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
 	exit
 fi
 
@@ -55,13 +80,6 @@ elif [[ "$STRICTNESS" == "-n" ]]; then
 elif [[ "$STRICTNESS" == "-s" ]]; then
 	REJECT_LINE_SCORE=80;
 fi
-
-
-# Define colors
-readonly CRed="\e[0;31m"
-readonly CGrn="\e[0;32m"
-readonly CYel="\e[0;33m"
-readonly CClr="\e[0m"
 
 SUMMARY_LINE="Summary of files: ";
 
