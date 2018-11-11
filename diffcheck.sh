@@ -6,8 +6,8 @@ readonly CGrn="\e[0;32m";
 readonly CYel="\e[0;33m";
 readonly CClr="\e[0m";
 
-# Parameters and syntax check.
-if [[ $1 == "-h" ]]; then
+# Define help function
+function print_help() {
 	# Print help 
 	echo -e "Plagiarism Checker for Python";
 	echo -e "A lightweight tool to detect structure of code plagiarism.";
@@ -24,72 +24,62 @@ if [[ $1 == "-h" ]]; then
 	echo -e "  -s Strict mode. Files lower than 80 scores will be judged as suspected.";
 	echo -e "  -S Score mode. You can specify your score limit with -S=[your score]."
 	exit;
-elif [[ $1 == "-q" ]] || [[ $1 == "-u" ]] || [[ $1 == "-v" ]]; then
-	readonly VERBOSITY=$1;
-	if [[ $2 == "-l" ]] || [[ $2 == "-n" ]] || [[ $2 == "-s" ]]; then
-		readonly STRICTNESS=$2;
-	elif [[ $2 == "" ]]; then
-		readonly STRICTNESS="-n";
-	elif [[ ${2%=*} == "-S" ]]; then
-		temp=`echo -e ${2##*=}`;
-		if [ -n "$temp" -a "$temp" = "${temp//[^0-9]/}" ] && [ $temp -ge 0 ] && [ $temp -le 100 ]; then
-			REJECT_LINE_SCORE=$temp;
-		else
-			echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
-			exit;
-		fi
-	else
-		echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
-		exit;
-	fi
-elif [[ $1 == "-l" ]] || [[ $1 == "-n" ]] || [[ $1 == "-s" ]] || [[ ${1%=*} == "-S" ]]; then
-	if [[ ${1%=*} == "-S" ]]; then
-		temp=`echo -e ${1##*=}`;
-		if [ -n "$temp" -a "$temp" = "${temp//[^0-9]/}" ] && [ $temp -ge 0 ] && [ $temp -le 100 ]; then
-			REJECT_LINE_SCORE=$temp;
-		else
-			echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
-			exit;
-		fi
-	else
-		readonly STRICTNESS=$1;
-	fi
-	if [[ $2 == "-q" ]] || [[ $2 == "-u" ]] || [[ $2 == "-v" ]]; then
-		readonly VERBOSITY=$2;
-	elif [[ $2 == "" ]]; then
-		readonly VERBOSITY="-u";
-	else
-		echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
-		exit;
-	fi
-elif [[ $1 == "" ]]; then
-	readonly VERBOSITY="-u";
-	readonly STRICTNESS="-n";
-else
-	echo -e "${CRed}[Error] Invalid syntax.$CClr\n";
-	exit;
+}
+
+# Parameters and syntax check. Latest parameters will override old ones.
+FORMATTER="";
+REJECT_LINE_SCORE=-1;
+for param in $@; do
+	case "${param#*-}" in
+		h* )
+			print_help;
+			;;
+		q )
+			FORMATTER="['[']Error";
+			;;
+		u )
+			FORMATTER="['['][SED][ure][srt][poe]";
+			;;
+		v )
+			FORMATTER="['[''][ISED][nure][fsrt][ope]";
+			;;
+		l )
+			REJECT_LINE_SCORE=60;
+			;;
+		n )
+			REJECT_LINE_SCORE=70;
+			;;
+		s )
+			REJECT_LINE_SCORE=80;
+			;;
+		S* )
+			temp=${param##*=};
+			if [ -n "$temp" -a "$temp" = "${temp//[^0-9]/}" ] && [ $temp -ge 0 ] && [ $temp -le 100 ]; then
+				REJECT_LINE_SCORE=$temp;
+			else
+				echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
+				print_help;
+			fi
+			;;
+		* )
+			echo -e "${CRed}[Error] Wrong parameter. Please see the help below.$CClr\n";
+			print_help;
+			;;
+	esac
+done
+
+if [[ "$FORMATTER" == "" ]]; then
+	FORMATTER="['['][SED][ure][srt][poe]";
+fi
+
+if [ $REJECT_LINE_SCORE == -1 ]; then
+	REJECT_LINE_SCORE=70;
 fi
 
 # Configuration for working environment.
 WORKING_DIR=".";
 TESTING_DIR="COMPARE_TESTS";
 ACCEPT_DATA_LIMIT=300;
-if [[ "$STRICTNESS" == "-l" ]]; then
-	REJECT_LINE_SCORE=60;
-elif [[ "$STRICTNESS" == "-n" ]]; then
-	REJECT_LINE_SCORE=70;
-elif [[ "$STRICTNESS" == "-s" ]]; then
-	REJECT_LINE_SCORE=80;
-fi
-
-if [[ "$VERBOSITY" == "-v" ]]; then
-	FORMATTER="['[''][ISED][nure][fsrt][ope]";
-elif [[ "$VERBOSITY" == "-u" ]]; then
-	FORMATTER="['['][SED][ure][srt][poe]";
-elif [[ "$VERBOSITY" == "-q" ]]; then
-	FORMATTER="['[']Error";
-fi
-
 SUMMARY_LINE="Summary of files: ";
 
 # Check if testing directory exists.
@@ -209,11 +199,8 @@ for i in `ls -1 | grep .py$ `; do
 	done
 done
 
-if [[ "$VERBOSITY" != "-q" ]]; then
-	echo -e "Clearing screen ...";
-	sleep 3;
-fi
-
+echo -e "${CGrn}[Info] Clearing screen ... $CClr" | grep "$FORMATTER";
+sleep 3;
 clear;
 echo -e "------ SUMMARY ------";
 echo -e "${VALID_FILES} valid files out of ${TOTAL_FILES} files.";
