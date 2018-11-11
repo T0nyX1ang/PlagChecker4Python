@@ -23,7 +23,10 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 
 ### Version 0.5.4
 * Making help lines in a function to shorten codes.
-* Changing the code to fit in with more parameters. Note that you only need to follow the rules, and **latest instructions will override old ones.** (e.g. ./diffcheck.sh -l -q -u -v -u -n -S=96 -s is equal to ./diffcheck.sh -u -s)
+* Changing the code to fit in with more parameters. Note that you only need to follow the rules, and **latest instructions will override old ones.** Here is an example:
+```
+./diffcheck.sh -l -q -u -v -u -n -S=96 -s is equal to ./diffcheck.sh -u -s
+```
 * Using new condition branchs to detect parameters to shorten codes.
 
 ### Version 0.5.3
