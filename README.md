@@ -21,6 +21,11 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 
 ## Update Notes:
 
+### Version 0.5.4
+* Making help lines in a function to shorten codes.
+* Changing the code to fit in with more parameters. Note that you only need to follow the rules, and **latest instructions will override old ones.**
+* Using new condition branchs to detect parameters to shorten codes.
+
 ### Version 0.5.3
 * Add more detailed statistics descriptions in the summary and somewhat change the format.
 * **NOTICE: The final version is coming soon, after those parameters are working fine after simplifying some codes.**
