@@ -18,9 +18,13 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 * Step 4: Detect copyer and copyee by comparing last modified time.
 
 **Note:** You can convert the code to detect other languages by changing the annotation flag and the regular expressions in the source code.
-**Note:** Testing file GVdiffcheck.sh. Welcome to have a test!
 
 ## Update Notes:
+
+### Version 0.5.6
+* Use functions instead of pipes to show messages. Thus a few codes have been changed.
+* Remove some redundant lines.
+* **Notice: GVdiffcheck.sh will be merged into main file diffcheck.sh in next version. According to the speed check, it is faster than the original files by 10%.**
 
 ### Version 0.5.5
 * Change methods to judge total files.
