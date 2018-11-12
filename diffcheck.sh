@@ -26,22 +26,43 @@ function print_help() {
 	exit;
 }
 
+function print_message() {
+	target_mode=$TARGET_MODE;
+	case $1 in
+		error )
+			echo -e "${CRed}[Error] $2$CClr";
+			;;
+		detected )
+			if [[ "$target_mode" != "q" ]]; then
+				echo -e "${CRed}[Detected] $2$CClr";
+			fi
+			;;
+		suspected )
+			if [[ "$target_mode" != "q" ]]; then
+				echo -e "${CYel}[Suspected] $2$CClr";
+			fi
+			;;
+		info )
+			if [[ "$target_mode" == "v" ]]; then
+				echo -e "${CGrn}[Info] $2$CClr";
+			fi
+			;;
+		* )
+			echo "${CRed}[Error] Unknown error!$CClr";
+			exit;
+	esac
+}
+
 # Parameters and syntax check. Latest parameters will override old ones.
-FORMATTER="";
+TARGET_MODE="u";
 REJECT_LINE_SCORE=-1;
 for param in $@; do
 	case "${param#*-}" in
 		h* )
 			print_help;
 			;;
-		q )
-			FORMATTER="['[']Error";
-			;;
-		u )
-			FORMATTER="['['][SED][ure][srt][poe]";
-			;;
-		v )
-			FORMATTER="['[''][ISED][nure][fsrt][ope]";
+		[quv] )
+			TARGET_MODE=${param#*-};
 			;;
 		l )
 			REJECT_LINE_SCORE=60;
@@ -57,20 +78,16 @@ for param in $@; do
 			if [ -n "$temp" -a "$temp" = "${temp//[^0-9]/}" ] && [ $temp -ge 0 ] && [ $temp -le 100 ]; then
 				REJECT_LINE_SCORE=$temp;
 			else
-				echo -e "${CRed}[Error] Invalid syntax or format in inputting scores.$CClr\n";
+				print_message error "Invalid syntax or format in inputting scores.\n";
 				print_help;
 			fi
 			;;
 		* )
-			echo -e "${CRed}[Error] Wrong parameter. Please see the help below.$CClr\n";
+			print_message error "Wrong parameter. Please see the help below.\n";
 			print_help;
 			;;
 	esac
 done
-
-if [[ "$FORMATTER" == "" ]]; then
-	FORMATTER="['['][SED][ure][srt][poe]";
-fi
 
 if [ $REJECT_LINE_SCORE == -1 ]; then
 	REJECT_LINE_SCORE=70;
@@ -84,20 +101,20 @@ SUMMARY_LINE="Summary of files: ";
 
 # Check if testing directory exists.
 if [[ ! -d "$TESTING_DIR" ]]; then
-	echo -e "${CGrn}[Info] Creating testing directory.$CClr" | grep "$FORMATTER";
+	print_message info "Creating testing directory.";
 	mkdir $TESTING_DIR;
 fi
 
 # Check if working and testing directory writable.
 if [[ ! -w "$TESTING_DIR" ]] || [[ ! -w "$WORKING_DIR" ]]; then
 	# Output an error if permission denied.
-	echo -e "${CRed}[Error] Permission Denied! Check your permission first.$CClr" | grep "$FORMATTER";
+	print_message error "Permission Denied! Check your permission first.";
 	exit;
 fi
 
 # Check log file validity.
 if [[ -f "$TESTING_DIR/log.txt" ]]; then
-	echo -e "${CGrn}[Info] Deleting existing log file.$CClr" | grep "$FORMATTER";
+	print_message info "Deleting existing log file.";
 	rm "$TESTING_DIR/log.txt";
 fi
 
@@ -110,31 +127,31 @@ FATAL_PAIRS=0;
 # Main process goes here.
 for i in `ls -1 | grep .py$ `; do
 	for j in `ls -1 | grep .py$ `; do
-		if [[ "$i" < "$j" ]] && [[ "$i" != "diffcheck.sh" ]] && [[ "$j" != "diffcheck.sh" ]] && [[ "$i" != "$TESTING_DIR" ]] && [[ "$j" != "$TESTING_DIR" ]]; then
+		if [[ "$i" < "$j" ]]; then
 			COMPARE_FILE="$i""_COMPARE_""$j"".txt";
 			
 			# Step 1
-			echo -e "${CGrn}[Info] Evaluating file sizes of $i.$CClr" | grep "$FORMATTER";
+			print_message info "Evaluating file sizes of $i.";
 			ORIG_FILE_1_SIZE=`du -h -b "$i"`;
 			FILE_1_SIZE=${ORIG_FILE_1_SIZE%%	*};
-			echo -e "${CGrn}[Info] Evaluating file lines of $i.$CClr" | grep "$FORMATTER";
+			print_message info "Evaluating file lines of $i.";
 			FILE_1_LINES=`grep ^[a-zA-Z0-P_=" "\*\&\(\)\$"	"] "$i" | wc -l`;
-			echo -e "${CGrn}[Info] Evaluating file sizes of $j.$CClr" | grep "$FORMATTER";
+			print_message info "Evaluating file sizes of $j.";
 			ORIG_FILE_2_SIZE=`du -h -b "$j"`;
 			FILE_2_SIZE=${ORIG_FILE_2_SIZE%%	*};
-			echo -e "${CGrn}[Info] Evaluating file lines of $j.$CClr" | grep "$FORMATTER";
+			print_message info "Evaluating file lines of $j.";
 			FILE_2_LINES=`grep ^[a-zA-Z0-P_=" "\*\&\(\)\$"	"] "$j" | wc -l`;
 			
-			echo -e "${CGrn}[Info] Comparing $i and $j.$CClr" | grep "$FORMATTER";
-			echo -e "${CGrn}[Info] Stage 1: Checking if two files are identical.$CClr" | grep "$FORMATTER";
+			print_message info "Comparing $i and $j.";
+			print_message info "Stage 1: Checking if two files are identical.";
 			cd "$TESTING_DIR";
 			# Suppressing all white spaces(-w), blank lines(-B), sensitive cases(-i) and annotations(-I '^#').
 			# Making an unified 'diff' output here.
 			diff -w -B -i -I '^#' -u "../""$i" "../""$j" > "$COMPARE_FILE";
 
 			if [[ ! -s "$COMPARE_FILE" ]]; then
-				echo -e "${CRed}[Detected] Plagiarism detected. Identical files found!$CClr" | grep "$FORMATTER";
-				echo -e "${CGrn}[Info] Saving file digest to log.$CClr" | grep "$FORMATTER";
+				print_message detected "Plagiarism detected. Identical files found!";
+				print_message info "Saving file digest to log.";
 				echo -e "Plagiarism detected. Identical files found!" >> "log.txt";
 				echo -e "-------- File Digest Separator --------" >> "log.txt";
 				echo -e "#1 Filename: $i::File #1 lines: $FILE_1_LINES::Different lines: 0::Score = 0." >> "log.txt";
@@ -146,47 +163,47 @@ for i in `ls -1 | grep .py$ `; do
 			fi
 			
 			# Step 2
-			echo -e "${CGrn}[Info] Stage 2: Checking if the difference of those files are above limit.$CClr" | grep "$FORMATTER";
+			print_message info "Stage 2: Checking if the difference of those files are above limit.";
 			ORIG_COMPARE_SIZE=`du -h -b "$COMPARE_FILE"`;
 			COMPARE_SIZE=${ORIG_COMPARE_SIZE%%	*};
 			((DATA_LIMIT=$FILE_1_SIZE+$FILE_2_SIZE-$COMPARE_SIZE+$ACCEPT_DATA_LIMIT));
 
 			if [ $DATA_LIMIT -le 0 ]; then
-				echo -e "${CGrn}[Info] Comparing $i $j OK!$CClr" | grep "$FORMATTER";
+				print_message info "Comparing $i $j OK!";
 				rm "$COMPARE_FILE";
-				echo -e "${CGrn}[Info] Deleting compare files.$CClr" | grep "$FORMATTER";
-				echo -e "${CGrn}[Info] Deleting OK!$CClr" | grep "$FORMATTER";
+				print_message info "Deleting compare files.";
+				print_message info "Deleting OK!";
 				cd "..";
 				continue;
 			fi
 			
 			# Step 3
-			echo -e "${CGrn}[Info] Stage 3: Checking those files line by line.$CClr" | grep "$FORMATTER";
+			print_message info "Stage 3: Checking those files line by line.";
 			FILE_1_DIFFERENT_LINES=`grep ^[-][a-zA-Z0-9_=" "\*\&\(\)\$"	"] "$COMPARE_FILE" | wc -l`;
 			FILE_2_DIFFERENT_LINES=`grep ^[+][a-zA-Z0-9_=" "\*\&\(\)\$"	"] "$COMPARE_FILE" | wc -l`;
 			((FILE_1_SCORE=$FILE_1_DIFFERENT_LINES*100/FILE_1_LINES));
 			((FILE_2_SCORE=$FILE_2_DIFFERENT_LINES*100/FILE_2_LINES));
 
 			if [ $FILE_1_SCORE -ge $REJECT_LINE_SCORE ] || [ $FILE_2_SCORE -ge $REJECT_LINE_SCORE ]; then
-				echo -e "${CGrn}[Info] Comparing $i $j OK!$CClr" | grep "$FORMATTER";
+				print_message info "Comparing $i $j OK!";
 				rm "$COMPARE_FILE";
-				echo -e "${CGrn}[Info] Deleting compare files.$CClr" | grep "$FORMATTER";
-				echo -e "${CGrn}[Info] Deleting OK!$CClr" | grep "$FORMATTER";
+				print_message info "Deleting compare files.";
+				print_message info "Deleting OK!";
 				cd "..";
 				continue;
 			fi
 
-			echo -e "${CYel}[Suspected] Suspected plagiarism detected. Different lines lower than the limit.$CClr" | grep "$FORMATTER";
-			echo -e "${CGrn}[Info] Saving file digest to log.$CClr" | grep "$FORMATTER";
+			print_message suspected "Suspected plagiarism detected. Different lines lower than the limit.";
+			print_message info "Saving file digest to log.";
 			echo -e "-------- File Digest Separator --------" >> "log.txt";
 			echo -e "#1 Filename: $i::File #1 lines: $FILE_1_LINES::Different lines: $FILE_1_DIFFERENT_LINES::Score = $FILE_1_SCORE." >> "log.txt";
 			echo -e "#2 Filename: $j::File #2 lines: $FILE_2_LINES::Different lines: $FILE_2_DIFFERENT_LINES::Score = $FILE_2_SCORE." >> "log.txt";
 			echo -e "" >> "log.txt";
-			echo -e "${CGrn}[Info] Preserving difference file for further investigation.$CClr" | grep "$FORMATTER";
+			print_message info "Preserving difference file for further investigation.";
 			((FATAL_PAIRS=$FATAL_PAIRS+1))
 
 			# Step 4
-			echo -e "${CGrn}[Info] Stage 4: Comparing last modified time.$CClr" | grep "$FORMATTER";
+			print_message info "Stage 4: Comparing last modified time.";
 			cd "..";
 			if [[ `find $i -newer $j` == $i ]]; then
 				SUMMARY_LINE=$SUMMARY_LINE"\nSuspected/Detected plagiarism: ${CGrn}$j$CClr->${CRed}$i$CClr [$FILE_2_SCORE:$FILE_1_SCORE].";
@@ -198,7 +215,7 @@ for i in `ls -1 | grep .py$ `; do
 	done
 done
 
-echo -e "${CGrn}[Info] Clearing screen ... $CClr" | grep "$FORMATTER";
+print_message info "Clearing screen ... ";
 sleep 3;
 clear;
 echo -e "------ SUMMARY ------";
