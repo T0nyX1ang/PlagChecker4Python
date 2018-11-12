@@ -102,9 +102,8 @@ if [[ -f "$TESTING_DIR/log.txt" ]]; then
 fi
 
 # Basic stats.
-TOTAL_FILES=`ls -1 | wc -l`;
+TOTAL_FILES=`ls -1 -l | grep ^- | wc -l`;
 VALID_FILES=`ls -1 | grep .py$ | wc -l`;
-((TOTAL_FILES=$TOTAL_FILES-2));
 ((CHECKED_PAIRS=$VALID_FILES*($VALID_FILES-1)/2));
 FATAL_PAIRS=0;
 
