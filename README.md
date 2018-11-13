@@ -1,25 +1,38 @@
 # PlagChecker4Python
 A lightweight tool to *ROUGHLY* detect of code plagiarism in Python using bash shell. 
 
-Command needed in your linux distribution:**du, diff, cd, mkdir, echo, exit, rm, grep, wc, find**.
+Command needed in your linux distribution:**cd, diff, echo, exit, find, grep, wc**.
+
+Release version 1.0.0 is coming.
 
 Usage:
-```
+```bash
 chmod +x diffcheck.sh
 ./diffcheck.sh 
 or 
-./diffcheck.sh -q/u/v -l/n/s/S=[score]
+./diffcheck.sh -q/u/v -l/n/s/S=score
 ```
 
-We are going to do a 3-step check to roughly detect code plagiarism. And a bonus step to detect copyer and copyee.
-* Step 1: Using *diff* tool to check if two files are identical. If true, put it in a record.
-* Step 2: Using *du* tool to detect how different two files above is. If it's different above a limit($ACCEPT_DATA_LIMIT), accept the pair.
-* Step 3: Basically analyzing those two files to judge suspected code plagiarism using a line limit($REJECT_LINE_SCORE).
-* Step 4: Detect copyer and copyee by comparing last modified time.
+We are going to do a 2-step check to roughly detect code plagiarism.
+
+* Step 1: Using *diff* tool to check if two files are identical, and basically analyzing those two files to judge suspected code plagiarism using a line limit($REJECT_LINE_SCORE).
+* Step 2: Detect copyer and copyee by comparing their last modified time.
 
 **Note:** You can convert the code to detect other languages by changing the annotation flag and the regular expressions in the source code.
 
 ## Update Notes:
+
+### Version 1.0.0
+* Rearrange message displaying styles.
+* Change help message displaying styles.
+* Delete redundant codes in $REJECT_LINE_SCORE.
+* Merging GVdiffcheck.sh with original diffcheck.sh to make it run faster.
+* Deleting step 2 because of its bad performance.
+* Combining 3 steps to *ONE* step.
+* Using pipes instead of creating new folders to save I/O.
+* Remove log files because of low usage, and it's replaced by the summary lines.
+* Change final screen flushing time.
+* Change README documents.
 
 ### Version 0.5.6
 * Use functions instead of pipes to show messages. Thus a few codes have been changed.
@@ -33,11 +46,11 @@ We are going to do a 3-step check to roughly detect code plagiarism. And a bonus
 ### Version 0.5.4
 * Making help lines in a function to shorten codes.
 * Changing the code to fit in with more parameters. Note that you only need to follow the rules, and **latest instructions will override old ones.** Here is an example:
-```
+```bash
 ./diffcheck.sh -l -q -u -v -u -n -S=96 -s 
 ```
 is equal to 
-```
+```bash
 ./diffcheck.sh -u -s
 ```
 * Using new condition branchs to detect parameters to shorten codes.
